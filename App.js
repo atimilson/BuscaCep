@@ -10,6 +10,7 @@ export default function App() {
 
   function limpar(){
     setCep('');
+    setCepUser(null);
     inputRef.current.focus();
   } 
 
