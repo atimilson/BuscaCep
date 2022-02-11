@@ -1,12 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React , {useState} from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView} from 'react-native';
+import api from './src/service/api';
 
 export default function App() {
+  const [cep, setCep] = useState('');
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={{alignItems: 'center'}}>
+        <Text style={styles.Text}>Digite o cep desejado</Text>
+        <TextInput 
+        style={styles.input}
+        placeholder="78065700"
+        value={cep}
+        onChangeText={(texto)=>setText(texto)}
+        keyboardType="numeric"
+        />
+      </View>
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -17,4 +29,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  text:{
+    marginTop:25,
+    marginBottom:25,
+    fontSize:30,
+    fontWeight: 'bold',
+  },
+  input:{
+    backgroundColor: '#FFF',
+    borderWidth:1,
+    borderColor: '#DDD',
+    borderRadius: 5,
+    width: '100%',
+    padding: 10,
+  }
 });
