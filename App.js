@@ -1,10 +1,36 @@
 import { StatusBar } from 'expo-status-bar';
-import React , {useState} from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView} from 'react-native';
+import React , {useState, useRef} from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Keyboard} from 'react-native';
 import api from './src/service/api';
 
 export default function App() {
   const [cep, setCep] = useState('');
+  const inputRef = useRef(null);
+  const [cepUser , setCepUser] = useState(null);
+
+  function limpar(){
+    setCep('');
+    inputRef.current.focus();
+  } 
+
+  async function buscar(){
+    if(cep == ''){
+      alert('Digite um cep valido');
+      setCep('');
+      setCepUser(null);
+      return;
+    }
+    try {
+      const response = await api.get(`https://viacep.com.br/ws/${cep}/json`);
+      console.log(response.data);
+      setCepUser(response.data);
+      Keyboard.dismiss();
+    } catch (error) {
+      console.log(error);
+    }
+    
+    
+  }
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar translucent={false} backgroundColor={'#FFF'} />
@@ -13,29 +39,39 @@ export default function App() {
           <Text style={styles.text}>Digite o cep desejado</Text>
           <TextInput 
           style={styles.input}
-          placeholder="78065700"
+          placeholder="EX. 78065700"
           value={cep}
           onChangeText={(texto)=>setCep(texto)}
           keyboardType="numeric"
+          ref={inputRef}
           />
         </View>
         <View style={[styles.container,styles.AreaBtn]}>
-          <TouchableOpacity style={[styles.Botao,styles.buscar]}>
+          <TouchableOpacity
+          onPress={buscar} 
+          style={[styles.Botao,styles.buscar]}>
             <Text style={styles.botaoText} >Buscar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.Botao, styles.limpar]}>
+
+
+
+          <TouchableOpacity
+          onPress={limpar}
+          style={[styles.Botao, styles.limpar]}>
             <Text style={styles.botaoText} >Limpar</Text>
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.Row}>
-        <View style={[styles.cardContainer,styles.cardResltado]}>
-          <Text style={styles.textResultado}>CEP:</Text>
-          <Text style={styles.textResultado}>Logradouro:</Text>
-          <Text style={styles.textResultado}>Bairro:</Text>
-          <Text style={styles.textResultado}>Cidade:</Text>
-          <Text style={styles.textResultado}>Estado:</Text>        
-        </View>
+      {cepUser &&
+         <View style={[styles.cardContainer,styles.cardResltado]}>
+           <Text style={styles.textResultado}>CEP: {cepUser.cep}</Text>
+           <Text style={styles.textResultado}>Logradouro: {cepUser.logradouro}</Text>
+           <Text style={styles.textResultado}>Bairro: {cepUser.bairro}</Text>
+           <Text style={styles.textResultado}>Cidade: {cepUser.localidade}</Text>
+           <Text style={styles.textResultado}>Estado: {cepUser.uf}</Text>        
+         </View>       
+      }
       </View>
     </SafeAreaView>
   );
@@ -107,7 +143,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF0000'
   },
   cardResltado:{
-    alignItems: 'flex-start',
+    alignItems: 'center',
+
   },
   Row:{
     flex: 1,
